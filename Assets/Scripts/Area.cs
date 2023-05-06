@@ -9,18 +9,22 @@ public class Area : MonoBehaviour
 {
     public GameObject notInfected;
     public const int numberOfDots = 100;
+    public float areaWidth = 5f;
+    public float areaHeight = 5f;
     public int numberOfInfected;
     public GameObject[] dots = new GameObject[numberOfDots];
-    public float moveSpeed = 1f;
+    //public float moveSpeed = 1f;
 
     float minX;
     float maxX;
     float minY;
     float maxY;
 
-
     void Start()
     {
+
+        transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
+
         Random.InitState(42);
         float dotRadius = notInfected.transform.localScale.x / 2;
         for (int i = 0; i < numberOfDots; i++)
@@ -35,11 +39,11 @@ public class Area : MonoBehaviour
             dots[i] = Instantiate(notInfected, randomSpawn, randomRotation);
         }
 
-        for(int i = 0; i < numberOfInfected; i++)
-        {
+        for (int i = 0; i < numberOfInfected; i++)
+        {     
             if (i >= numberOfDots)
                 return;
-            dots[i].gameObject.tag = "Infected";
+                dots[i].gameObject.tag = "Infected";
         }
 
 
@@ -62,13 +66,13 @@ public class Area : MonoBehaviour
                 if (dots[i].transform.eulerAngles.z < 0)
                     dots[i].transform.eulerAngles = new Vector3(0, 0, 359);
 
-                dots[i].transform.position += dots[i].transform.up * moveSpeed * 7 * Time.deltaTime;
+                dots[i].transform.position += dots[i].transform.up * dots[i].GetComponent<Dot>().moveSpeed * 7 * Time.deltaTime;
 
                 float xPos = dots[i].transform.position.x;
                 float yPos = dots[i].transform.position.y;
                 if (xPos < minX || xPos > maxX || yPos > maxY || yPos < minY)
                 {
-                    
+
                     if (xPos < minX)
                     {
                         dots[i].transform.eulerAngles = new Vector3(0, 0, -dots[i].transform.eulerAngles.z);
@@ -90,10 +94,10 @@ public class Area : MonoBehaviour
                         dots[i].transform.position = new Vector3(xPos, maxY - 0.01f, 0);
                     }
                 }
-                
-                    
 
-                
+
+
+
 
             }
         }

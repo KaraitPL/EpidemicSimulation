@@ -136,4 +136,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de8e0f30325248a4dbf812c0d77a714b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  immunity: 50
+  healthySpeed: 1
+  infectedSpeed: 0.5
+  infectionProb: 0.5
+  recoveryProb: 0.5
+  symptomsProb: 0.5
+  moveSpeed: 1
