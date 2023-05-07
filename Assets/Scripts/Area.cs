@@ -8,11 +8,11 @@ using Random = UnityEngine.Random;
 public class Area : MonoBehaviour
 {
     public GameObject notInfected;
-    public const int numberOfDots = 100;
+    public const int numberOfDots = 200;
     public float areaWidth = 5f;
     public float areaHeight = 5f;
     public int numberOfInfected;
-    public GameObject[] dots = new GameObject[numberOfDots];
+    private GameObject[] dots = new GameObject[numberOfDots];
     //public float moveSpeed = 1f;
 
     float minX;
@@ -25,7 +25,7 @@ public class Area : MonoBehaviour
 
         transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
 
-        Random.InitState(42);
+        Random.InitState((int)DateTime.Now.Ticks);
         float dotRadius = notInfected.transform.localScale.x / 2;
         for (int i = 0; i < numberOfDots; i++)
         {
