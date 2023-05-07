@@ -138,12 +138,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthySpeed: 1
   infectedSpeed: 0.5
-  infectionProb: 0.5
-  reInfectionProb: 0.2
-  recoveryProb: 0.5
-  symptomsProb: 0.5
+  infectionDeathRate: 3
+  infectionRate: 2
+  reInfectionRate: 1.5
+  recoveryRate: 0.5
+  symptomsRate: 0.4
   moveSpeed: 1
   isChanging: 0
-  maxLifetime: 30
+  maxLifetime: 100
   liveTime: 0
   DeltaTime: 0
