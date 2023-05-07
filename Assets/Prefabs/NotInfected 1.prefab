@@ -139,6 +139,11 @@ MonoBehaviour:
   healthySpeed: 1
   infectedSpeed: 0.5
   infectionProb: 0.5
+  reInfectionProb: 0.2
   recoveryProb: 0.5
   symptomsProb: 0.5
   moveSpeed: 1
+  isChanging: 0
+  maxLifetime: 30
+  liveTime: 0
+  DeltaTime: 0
