@@ -7,13 +7,13 @@ using Random = UnityEngine.Random;
 
 public class Area : MonoBehaviour
 {
+    public float timeMultiplier = 1;
     public GameObject notInfected;
     public const int numberOfDots = 200;
     public float areaWidth = 5f;
     public float areaHeight = 5f;
     public int numberOfInfected;
     private GameObject[] dots = new GameObject[numberOfDots];
-    //public float moveSpeed = 1f;
 
     float minX;
     float maxX;
@@ -66,7 +66,7 @@ public class Area : MonoBehaviour
                 if (dots[i].transform.eulerAngles.z < 0)
                     dots[i].transform.eulerAngles = new Vector3(0, 0, 359);
 
-                dots[i].transform.position += dots[i].transform.up * dots[i].GetComponent<Dot>().moveSpeed * 7 * Time.deltaTime;
+                dots[i].transform.position += dots[i].transform.up * dots[i].GetComponent<Dot>().GetMoveSpeed() * 7 * Time.deltaTime;
 
                 float xPos = dots[i].transform.position.x;
                 float yPos = dots[i].transform.position.y;
