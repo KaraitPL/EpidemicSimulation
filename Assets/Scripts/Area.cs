@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
+
 
 public class Area : MonoBehaviour
 {
@@ -16,9 +19,20 @@ public class Area : MonoBehaviour
     public int numberOfInfected;
     private GameObject[] dots = new GameObject[numberOfDots];
 
+    private string filePath = "C:\\DaneEpidemia\\dane.csv";
+    private StreamWriter writer;
+
+    private NumberFormatInfo nfi;
+
     private float currentYear;
 
     private List<WorldState> stateEveryYear;
+
+    //private static float infectionDeathRate = 0.04f;
+    //private static float infectionRate = 0.2f;
+    //private static float reInfectionRate = 0.1f;
+    //private static float recoveryRate = 0.2f;
+    //private static float symptomsRate = 0.3f;
 
     private static float infectionDeathRate = 0f;
     private static float infectionRate = 0f;
@@ -39,7 +53,7 @@ public class Area : MonoBehaviour
             this.numberOfDead = numberOfDead;
             this.numberOfRecovered = numberOfRecovered;
         }
-        
+
         public short GetNotinfected() { return numberOfNotinfected; }
         public short GetInfected() { return numberOfInfected; }
         public int GetDead() { return numberOfDead; }
@@ -59,6 +73,12 @@ public class Area : MonoBehaviour
 
     void Start()
     {
+        nfi = new CultureInfo("en-US", false).NumberFormat;
+        writer = new StreamWriter(filePath);
+        writer.WriteLine("InfDeadRate,InfRate,ReInfRate,RecovRate,SympRate,Dead,Infected,Notinfecte,Recovered");
+
+
+        Random.InitState(5);
         Initialize();
     }
     void FixedUpdate()
@@ -68,19 +88,20 @@ public class Area : MonoBehaviour
         if (year > currentYear)
         {
             currentYear = year;
+            CountDifferentDots();
             if (currentYear == 10)
             {
                 PrintStateArray();
                 NewSimulation();
             }
-            CountDifferentDots();
-            
+
+
         }
-        
+
         //Debug.Log(countSignal);
         //if (Input.GetKey(KeyCode.Space))
         //{
-        if(currentYear < 10)
+        if (currentYear < 10)
         {
             for (int i = 0; i < numberOfDots; i++)
             {
@@ -152,35 +173,42 @@ public class Area : MonoBehaviour
 
     public void PrintStateArray()
     {
-        Debug.Log("Dla " + currentYear + " lat:");
-        Debug.Log("IDR: " + infectionDeathRate + " IR: " + infectionRate + " RIR: " + reInfectionRate + " RR: " + recoveryRate + " SR: " + symptomsRate);
-        foreach(WorldState worldState in stateEveryYear)
+        for (int i = 0; i < 10; i++)
         {
-            Debug.Log(worldState.ToString());
+            writer.WriteLine(infectionDeathRate.ToString(nfi) + "," + infectionRate.ToString(nfi) + "," + reInfectionRate.ToString(nfi) + "," + recoveryRate.ToString(nfi) + "," +symptomsRate.ToString(nfi) + "," + stateEveryYear[i].GetNotinfected() + "," + stateEveryYear[i].GetInfected() + "," + stateEveryYear[i].GetRecovered() + "," + stateEveryYear[i].GetDead() + "," + stateEveryYear[i + 1].GetNotinfected() + "," + stateEveryYear[i + 1].GetInfected() + "," + stateEveryYear[i + 1].GetRecovered() + "," + stateEveryYear[i + 1].GetDead());
+            writer.Flush();
         }
+    }
+
+    void OnApplicationQuit()
+    {
+        writer.Close();
     }
 
     public void NewSimulation()
     {
-        infectionDeathRate += 0.05f;
+        infectionDeathRate += 0.33f;
         if (infectionDeathRate > 1f)
         {
             infectionDeathRate = 0f;
-            infectionRate += 0.05f;
-            if(infectionRate > 1f)
+            infectionRate += 0.33f;
+            if (infectionRate > 1f)
             {
                 infectionRate = 0f;
-                reInfectionRate += 0.05f;
+                reInfectionRate += 0.33f;
                 if (reInfectionRate > 1f)
                 {
                     reInfectionRate = 0f;
-                    recoveryRate += 0.05f;
-                    if(recoveryRate > 1f)
+                    recoveryRate += 0.33f;
+                    if (recoveryRate > 1f)
                     {
                         recoveryRate = 0f;
-                        symptomsRate += 0.05f;
+                        symptomsRate += 0.33f;
                         if (symptomsRate > 1f)
+                        {
                             Debug.Log("Koniec");
+                            Application.Quit();
+                        }
                     }
                 }
             }
@@ -198,7 +226,8 @@ public class Area : MonoBehaviour
 
         transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
 
-        Random.InitState((int)DateTime.Now.Ticks);
+        //Random.InitState((int)DateTime.Now.Ticks);
+
         float dotRadius = notInfected.transform.localScale.x / 2;
         for (int i = 0; i < numberOfDots; i++)
         {
@@ -226,5 +255,6 @@ public class Area : MonoBehaviour
     public float GetReInfectionRate() { return reInfectionRate; }
     public float GetRecoveryRate() { return recoveryRate; }
     public float GetSymptomsRate() { return symptomsRate; }
+
 
 }

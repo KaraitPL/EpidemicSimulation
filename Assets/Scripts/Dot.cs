@@ -39,7 +39,7 @@ public class Dot : MonoBehaviour
     private Area areaScript;
     private void Start()
     {
-        
+        Random.InitState(5);
         spriteRenderer = GetComponent<SpriteRenderer>();
         areaScript = area.GetComponent<Area>();
 
@@ -71,7 +71,7 @@ public class Dot : MonoBehaviour
         setColor(Color.yellow);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (yearOfSimulation < 10)
         {

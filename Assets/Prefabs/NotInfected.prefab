@@ -103,11 +103,6 @@ MonoBehaviour:
   healthySpeed: 1
   infectedSpeed: 0.5
   defaultMoveSpeed: 0.3
-  infectionDeathRate: 0.05
-  infectionRate: 0.3
-  reInfectionRate: 0.1
-  recoveryRate: 3
-  symptomsRate: 0.5
   isChanging: 0
   infectionZone: {fileID: 2844622660745929532}
   infectionProb:
