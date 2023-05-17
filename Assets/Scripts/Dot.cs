@@ -11,12 +11,14 @@ public class Dot : MonoBehaviour
     public float infectedSpeed = 0.5f;
     public float defaultMoveSpeed = 0.2f;
     private SpriteRenderer spriteRenderer;
-    public float infectionDeathRate = 1f;
-    public float infectionRate = 1f;
-    public float reInfectionRate = 1f;
+
+    private float infectionDeathRate;
+    private float infectionRate;
+    private float reInfectionRate;
+    private float recoveryRate;
+    private float symptomsRate;
+
     private float yearOfSimulation = 0;
-    public float recoveryRate = 1f;
-    public float symptomsRate = 1f;
     private float moveSpeed = 0.2f;
     private float timeMultiplier;
     public bool isChanging = false;
@@ -37,8 +39,17 @@ public class Dot : MonoBehaviour
     private Area areaScript;
     private void Start()
     {
+        
         spriteRenderer = GetComponent<SpriteRenderer>();
         areaScript = area.GetComponent<Area>();
+
+        //Pobieranie wartoœci parametrów modyfikowanych w skrypcie Area
+        infectionDeathRate = areaScript.GetInfectionDeathRate();
+        infectionRate = areaScript.GetInfectionRate();
+        reInfectionRate = areaScript.GetReInfectionRate();
+        recoveryRate = areaScript.GetRecoveryRate();
+        symptomsRate = areaScript.GetSymptomsRate();
+
 
         timeMultiplier = areaScript.timeMultiplier;
         actionLength = actionLength / timeMultiplier;
@@ -62,72 +73,74 @@ public class Dot : MonoBehaviour
 
     private void Update()
     {
-        yearDeltaTime += Time.deltaTime;
-        actionDeltaTime += Time.deltaTime;
-        infectionZone.tag = this.tag;
-        if(yearDeltaTime > yearLength) //Po czasie roku obiekt starzeje siê o rok
+        if (yearOfSimulation < 10)
         {
-            Debug.Log(yearOfSimulation);
-            updateColor();
-            liveTime++;
-            if (liveTime > 99)
-                liveTime = 99;
-            yearOfSimulation++;
-            yearDeltaTime = 0;
-        }
-
-        if (actionDeltaTime > actionLength) //Po ustalonym czasie podejmowana jest próba zara¿enia/œmierci/wyleczenia
-        {
-
-            if (gameObject.tag == "Infected" || gameObject.tag == "SInfected")
+            yearDeltaTime += Time.deltaTime;
+            actionDeltaTime += Time.deltaTime;
+            infectionZone.tag = this.tag;
+            if (yearDeltaTime > yearLength) //Po czasie roku obiekt starzeje siê o rok
             {
-                if ((float)Random.Range(0, 100000) / 100000 <= deathInfectedProb[liveTime])
-                {
-                    gameObject.tag = "Dead";
-                }
-                else if(gameObject.tag == "SInfected")
-                { 
-                    if ((float)Random.Range(0, 100000) / 100000 <= recoveryProb[liveTime])
-                        gameObject.tag = "Recovered";
-                }
+                updateColor();
+                liveTime++;
+                if (liveTime > 99)
+                    liveTime = 99;
+                yearOfSimulation++;
+                yearDeltaTime = 0;
             }
-            else
+
+            if (actionDeltaTime > actionLength) //Po ustalonym czasie podejmowana jest próba zara¿enia/œmierci/wyleczenia
             {
-                if ((float)Random.Range(0, 100000) / 100000 <= deathHealthyProb[liveTime])
+
+                if (gameObject.tag == "Infected" || gameObject.tag == "SInfected")
                 {
-                    gameObject.tag = "Dead";
+                    if ((float)Random.Range(0, 100000) / 100000 <= deathInfectedProb[liveTime])
+                    {
+                        gameObject.tag = "Dead";
+                    }
+                    else if (gameObject.tag == "SInfected")
+                    {
+                        if ((float)Random.Range(0, 100000) / 100000 <= recoveryProb[liveTime])
+                            gameObject.tag = "Recovered";
+                    }
                 }
+                else
+                {
+                    if ((float)Random.Range(0, 100000) / 100000 <= deathHealthyProb[liveTime])
+                    {
+                        gameObject.tag = "Dead";
+                    }
+                }
+
+                if (gameObject.tag == "Infected")
+                {
+                    if ((float)Random.Range(0, 100000) / 100000 <= symptomsProb[liveTime])
+                        gameObject.tag = "SInfected";
+                }
+
+                actionDeltaTime = 0;
             }
+
 
             if (gameObject.tag == "Infected")
             {
-                if ((float)Random.Range(0, 100000) / 100000 <= symptomsProb[liveTime])
-                    gameObject.tag = "SInfected";
+                setColor(Color.magenta);
+                moveSpeed = defaultMoveSpeed * healthySpeed;
             }
-
-            actionDeltaTime = 0;
-        }
-
-
-        if (gameObject.tag == "Infected")
-        {
-            setColor(Color.magenta);
-            moveSpeed = defaultMoveSpeed * healthySpeed;
-        }
-        else if (gameObject.tag == "SInfected")
-        {
-            setColor(Color.red);
-            moveSpeed = defaultMoveSpeed * infectedSpeed;
-        }
-        else if(gameObject.tag == "Dead")
-        {
-            setColor(Color.grey);
-            moveSpeed = 0;
-        }
-        else if( gameObject.tag == "Recovered")
-        {
-            setColor(Color.green);
-            moveSpeed = defaultMoveSpeed;
+            else if (gameObject.tag == "SInfected")
+            {
+                setColor(Color.red);
+                moveSpeed = defaultMoveSpeed * infectedSpeed;
+            }
+            else if (gameObject.tag == "Dead")
+            {
+                setColor(Color.grey);
+                moveSpeed = 0;
+            }
+            else if (gameObject.tag == "Recovered")
+            {
+                setColor(Color.green);
+                moveSpeed = defaultMoveSpeed;
+            }
         }
 
     }
@@ -221,6 +234,8 @@ public class Dot : MonoBehaviour
     public float GetMoveSpeed() { return moveSpeed; }
 
     public float GetActionLength() { return actionLength; }
+
+    public float GetYearOfSimulation() { return yearOfSimulation; }
 
 
 

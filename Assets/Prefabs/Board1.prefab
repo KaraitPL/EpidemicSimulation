@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ae8e470a9a9da14f9bc7e380d63c53c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeMultiplier: 10
+  timeMultiplier: 20
   notInfected: {fileID: 1899640138448725607, guid: 35700f20f26bad340bd888f7b206eb9a, type: 3}
   areaWidth: 10
   areaHeight: 10

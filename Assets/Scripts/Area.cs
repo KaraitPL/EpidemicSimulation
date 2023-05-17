@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -15,6 +16,38 @@ public class Area : MonoBehaviour
     public int numberOfInfected;
     private GameObject[] dots = new GameObject[numberOfDots];
 
+    private float currentYear;
+
+    private List<WorldState> stateEveryYear;
+
+    private static float infectionDeathRate = 0f;
+    private static float infectionRate = 0f;
+    private static float reInfectionRate = 0f;
+    private static float recoveryRate = 0f;
+    private static float symptomsRate = 0f;
+
+    public struct WorldState
+    {
+        private short numberOfNotinfected;
+        private short numberOfInfected;
+        private short numberOfDead;
+        public WorldState(short numberOfNotinfected, short numberOfInfected, short numberOfDead)
+        {
+            this.numberOfNotinfected = numberOfNotinfected;
+            this.numberOfInfected = numberOfInfected;
+            this.numberOfDead = numberOfDead;
+        }
+        
+        public short GetNotinfected() { return numberOfNotinfected; }
+        public short GetInfected() { return numberOfInfected; }
+        public int GetDead() { return numberOfDead; }
+
+        public override string ToString()
+        {
+            return "Notinfected: " + numberOfNotinfected + " Infected: " + numberOfInfected + " Dead: " + numberOfDead;
+        }
+    }
+
     float minX;
     float maxX;
     float minY;
@@ -22,37 +55,28 @@ public class Area : MonoBehaviour
 
     void Start()
     {
-
-        transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
-
-        Random.InitState((int)DateTime.Now.Ticks);
-        float dotRadius = notInfected.transform.localScale.x / 2;
-        for (int i = 0; i < numberOfDots; i++)
-        {
-            minX = transform.position.x - transform.localScale.x / 2 + dotRadius;
-            maxX = transform.position.x + transform.localScale.x / 2 - dotRadius;
-            minY = transform.position.y - transform.localScale.y / 2 + dotRadius;
-            maxY = transform.position.y + transform.localScale.y / 2 - dotRadius;
-
-            Vector3 randomSpawn = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0f);
-            Quaternion randomRotation = Quaternion.Euler(0, 0, Random.Range(0.0f, 360.0f));
-            dots[i] = Instantiate(notInfected, randomSpawn, randomRotation);
-        }
-
-        for (int i = 0; i < numberOfInfected; i++)
-        {     
-            if (i >= numberOfDots)
-                return;
-                dots[i].gameObject.tag = "Infected";
-        }
-
-
-
+        Initialize();
     }
     void FixedUpdate()
     {
+        float year = dots[0].GetComponent<Dot>().GetYearOfSimulation();
 
-        if (Input.GetKey(KeyCode.Space))
+        if (year > currentYear)
+        {
+            currentYear = year;
+            if (currentYear == 10)
+            {
+                PrintStateArray();
+                NewSimulation();
+            }
+            CountDifferentDots();
+            
+        }
+        
+        //Debug.Log(countSignal);
+        //if (Input.GetKey(KeyCode.Space))
+        //{
+        if(currentYear < 10)
         {
             for (int i = 0; i < numberOfDots; i++)
             {
@@ -98,8 +122,103 @@ public class Area : MonoBehaviour
 
 
 
-
             }
         }
+
+        //}
     }
+
+    public void CountDifferentDots()
+    {
+        short notinfNumber = 0;
+        short infNumber = 0;
+        short deadNumber = 0;
+
+        foreach (GameObject dot in dots)
+        {
+            if (dot.tag == "Uninfected" || dot.tag == "Recovered") { notinfNumber++; }
+            else if (dot.tag == "Infected" || dot.tag == "SInfected") { infNumber++; }
+            else if (dot.tag == "Dead") { deadNumber++; }
+        }
+
+        stateEveryYear.Add(new WorldState(notinfNumber, infNumber, deadNumber));
+    }
+
+    public void PrintStateArray()
+    {
+        Debug.Log("Dla " + currentYear + " lat:");
+        Debug.Log("IDR: " + infectionDeathRate + " IR: " + infectionRate + " RIR: " + reInfectionRate + " RR: " + recoveryRate + " SR: " + symptomsRate);
+        foreach(WorldState worldState in stateEveryYear)
+        {
+            Debug.Log(worldState.ToString());
+        }
+    }
+
+    public void NewSimulation()
+    {
+        infectionDeathRate += 0.05f;
+        if (infectionDeathRate > 1f)
+        {
+            infectionDeathRate = 0f;
+            infectionRate += 0.05f;
+            if(infectionRate > 1f)
+            {
+                infectionRate = 0f;
+                reInfectionRate += 0.05f;
+                if (reInfectionRate > 1f)
+                {
+                    reInfectionRate = 0f;
+                    recoveryRate += 0.05f;
+                    if(recoveryRate > 1f)
+                    {
+                        recoveryRate = 0f;
+                        symptomsRate += 0.05f;
+                        if (symptomsRate > 1f)
+                            Debug.Log("Koniec");
+                    }
+                }
+            }
+        }
+        Initialize();
+    }
+
+    public void Initialize()
+    {
+        for (int i = 0; i < numberOfDots; i++)
+        {
+            Destroy(dots[i]);
+        }
+        stateEveryYear = new List<WorldState>();
+
+        transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
+
+        Random.InitState((int)DateTime.Now.Ticks);
+        float dotRadius = notInfected.transform.localScale.x / 2;
+        for (int i = 0; i < numberOfDots; i++)
+        {
+            minX = transform.position.x - transform.localScale.x / 2 + dotRadius;
+            maxX = transform.position.x + transform.localScale.x / 2 - dotRadius;
+            minY = transform.position.y - transform.localScale.y / 2 + dotRadius;
+            maxY = transform.position.y + transform.localScale.y / 2 - dotRadius;
+
+            Vector3 randomSpawn = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0f);
+            Quaternion randomRotation = Quaternion.Euler(0, 0, Random.Range(0.0f, 360.0f));
+            dots[i] = Instantiate(notInfected, randomSpawn, randomRotation);
+        }
+
+        for (int i = 0; i < numberOfInfected; i++)
+        {
+            if (i >= numberOfDots)
+                return;
+            dots[i].gameObject.tag = "Infected";
+        }
+        currentYear = -1;
+    }
+
+    public float GetInfectionDeathRate() { return infectionDeathRate; }
+    public float GetInfectionRate() { return infectionRate; }
+    public float GetReInfectionRate() { return reInfectionRate; }
+    public float GetRecoveryRate() { return recoveryRate; }
+    public float GetSymptomsRate() { return symptomsRate; }
+
 }
