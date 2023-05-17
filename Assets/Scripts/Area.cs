@@ -31,20 +31,24 @@ public class Area : MonoBehaviour
         private short numberOfNotinfected;
         private short numberOfInfected;
         private short numberOfDead;
-        public WorldState(short numberOfNotinfected, short numberOfInfected, short numberOfDead)
+        private short numberOfRecovered;
+        public WorldState(short numberOfNotinfected, short numberOfInfected, short numberOfDead, short numberOfRecovered)
         {
             this.numberOfNotinfected = numberOfNotinfected;
             this.numberOfInfected = numberOfInfected;
             this.numberOfDead = numberOfDead;
+            this.numberOfRecovered = numberOfRecovered;
         }
         
         public short GetNotinfected() { return numberOfNotinfected; }
         public short GetInfected() { return numberOfInfected; }
         public int GetDead() { return numberOfDead; }
 
+        public int GetRecovered() { return numberOfRecovered; }
+
         public override string ToString()
         {
-            return "Notinfected: " + numberOfNotinfected + " Infected: " + numberOfInfected + " Dead: " + numberOfDead;
+            return "Notinfected: " + numberOfNotinfected + " Infected: " + numberOfInfected + " Dead: " + numberOfDead + " Recovered: " + numberOfRecovered;
         }
     }
 
@@ -133,15 +137,17 @@ public class Area : MonoBehaviour
         short notinfNumber = 0;
         short infNumber = 0;
         short deadNumber = 0;
+        short recoverNumber = 0;
 
         foreach (GameObject dot in dots)
         {
-            if (dot.tag == "Uninfected" || dot.tag == "Recovered") { notinfNumber++; }
+            if (dot.tag == "Uninfected") { notinfNumber++; }
             else if (dot.tag == "Infected" || dot.tag == "SInfected") { infNumber++; }
             else if (dot.tag == "Dead") { deadNumber++; }
+            else if (dot.tag == "Recovered") { recoverNumber++; }
         }
 
-        stateEveryYear.Add(new WorldState(notinfNumber, infNumber, deadNumber));
+        stateEveryYear.Add(new WorldState(notinfNumber, infNumber, deadNumber, recoverNumber));
     }
 
     public void PrintStateArray()
