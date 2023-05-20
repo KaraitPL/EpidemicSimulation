@@ -19,7 +19,7 @@ public class Area : MonoBehaviour
     public int numberOfInfected;
     private GameObject[] dots = new GameObject[numberOfDots];
 
-    private string filePath = "C:\\DaneEpidemia\\dane.csv";
+    private string filePath = "C:\\DaneEpidemia\\dane2.csv";
     private StreamWriter writer;
 
     private NumberFormatInfo nfi;
@@ -34,11 +34,11 @@ public class Area : MonoBehaviour
     //private static float recoveryRate = 0.2f;
     //private static float symptomsRate = 0.3f;
 
-    private static float infectionDeathRate = 0f;
-    private static float infectionRate = 0f;
-    private static float reInfectionRate = 0f;
-    private static float recoveryRate = 0f;
-    private static float symptomsRate = 0f;
+    private static float infectionDeathRate = 0.05f;
+    private static float infectionRate = 0.05f;
+    private static float reInfectionRate = 0.05f;
+    private static float recoveryRate = 0.05f;
+    private static float symptomsRate = 0.05f;
 
     public struct WorldState
     {
@@ -78,7 +78,7 @@ public class Area : MonoBehaviour
         writer.WriteLine("InfDeadRate,InfRate,ReInfRate,RecovRate,SympRate,Dead,Infected,Notinfecte,Recovered");
 
 
-        Random.InitState(5);
+        Random.InitState((int)DateTime.Now.Ticks);
         Initialize();
     }
     void FixedUpdate()
@@ -187,24 +187,24 @@ public class Area : MonoBehaviour
 
     public void NewSimulation()
     {
-        infectionDeathRate += 0.33f;
-        if (infectionDeathRate > 1f)
+        infectionDeathRate += 0.13f;
+        if (infectionDeathRate > 0.71f)
         {
             infectionDeathRate = 0f;
-            infectionRate += 0.33f;
-            if (infectionRate > 1f)
+            infectionRate += 0.13f;
+            if (infectionRate > 0.71f)
             {
                 infectionRate = 0f;
-                reInfectionRate += 0.33f;
-                if (reInfectionRate > 1f)
+                reInfectionRate += 0.13f;
+                if (reInfectionRate > 0.71f)
                 {
                     reInfectionRate = 0f;
-                    recoveryRate += 0.33f;
-                    if (recoveryRate > 1f)
+                    recoveryRate += 0.13f;
+                    if (recoveryRate > 0.71f)
                     {
                         recoveryRate = 0f;
-                        symptomsRate += 0.33f;
-                        if (symptomsRate > 1f)
+                        symptomsRate += 0.13f;
+                        if (symptomsRate > 0.71f)
                         {
                             Debug.Log("Koniec");
                             Application.Quit();

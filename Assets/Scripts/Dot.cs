@@ -39,7 +39,7 @@ public class Dot : MonoBehaviour
     private Area areaScript;
     private void Start()
     {
-        Random.InitState(5);
+        Random.InitState((int)DateTime.Now.Ticks);
         spriteRenderer = GetComponent<SpriteRenderer>();
         areaScript = area.GetComponent<Area>();
 
