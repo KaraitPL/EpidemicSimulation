@@ -19,7 +19,7 @@ public class Area : MonoBehaviour
     public int numberOfInfected;
     private GameObject[] dots = new GameObject[numberOfDots];
 
-    private string filePath = "C:\\DaneEpidemia\\dane2.csv";
+    private string filePath = "C:\\DaneEpidemia\\daneNowe212.csv";
     private StreamWriter writer;
 
     private NumberFormatInfo nfi;
@@ -27,6 +27,7 @@ public class Area : MonoBehaviour
     private float currentYear;
 
     private List<WorldState> stateEveryYear;
+    private List<DotState[]> dotsStateEveryYear; //Lista tablic zawieracj¹cych stan wszystkich kropek
 
     //private static float infectionDeathRate = 0.04f;
     //private static float infectionRate = 0.2f;
@@ -66,6 +67,60 @@ public class Area : MonoBehaviour
         }
     }
 
+    public struct DotState
+    {
+        private float xPos;
+        private float yPos;
+        private float zRot;
+        private short notinfected;
+        private short infected;
+        private short recovered;
+        private short dead;
+
+        public DotState(float xPos, float yPos, float zRot, short a, short b, short c, short d)
+        {
+            this.xPos = xPos;
+            this.yPos = yPos;
+            this.zRot = zRot;
+            this.notinfected = a;
+            this.infected = b;
+            this.recovered = c;
+            this.dead = d;
+        }
+
+        public float GetxPos()
+        {
+            return xPos;
+        }
+        public float GetyPos()
+        {
+            return yPos;
+        }
+        public float GetzRot()
+        {
+            return zRot;
+        }
+        public short GetNotInfected()
+        {
+            return notinfected;
+        }
+        public short GetInfected()
+        {
+            return infected;
+        }
+        public short GetRecovered()
+        {
+            return recovered;
+        }
+        public short GetDead()
+        {
+            return dead;
+        }
+
+        
+
+    }
+
     float minX;
     float maxX;
     float minY;
@@ -75,7 +130,7 @@ public class Area : MonoBehaviour
     {
         nfi = new CultureInfo("en-US", false).NumberFormat;
         writer = new StreamWriter(filePath);
-        writer.WriteLine("InfDeadRate,InfRate,ReInfRate,RecovRate,SympRate,Dead,Infected,Notinfecte,Recovered");
+        //writer.WriteLine("InfDeadRate,InfRate,ReInfRate,RecovRate,SympRate,Dead,Infected,Notinfecte,Recovered");
 
 
         Random.InitState((int)DateTime.Now.Ticks);
@@ -91,7 +146,8 @@ public class Area : MonoBehaviour
             CountDifferentDots();
             if (currentYear == 10)
             {
-                PrintStateArray();
+                //PrintStateArray();
+                PrintStateOfDots();
                 NewSimulation();
             }
 
@@ -168,6 +224,29 @@ public class Area : MonoBehaviour
             else if (dot.tag == "Recovered") { recoverNumber++; }
         }
 
+        DotState[] dotsArray = new DotState[200];
+
+        for (int i = 0; i < 200; i++)
+        {
+            short notinf = 0;
+            if (dots[i].tag == "Uninfected")
+                notinf = 1;
+
+            short inf = 0;
+            if (dots[i].tag == "Infected" || dots[i].tag == "SInfected")
+                inf = 1;
+
+            short rec = 0;
+            if (dots[i].tag == "Recovered")
+                rec = 1;
+
+            short dead = 0;
+            if (dots[i].tag == "Dead")
+                dead = 1;
+
+            dotsArray[i] = new DotState(dots[i].transform.position.x, dots[i].transform.position.y, dots[i].transform.rotation.z, notinf, inf, rec, dead);
+        }
+        dotsStateEveryYear.Add(dotsArray);
         stateEveryYear.Add(new WorldState(notinfNumber, infNumber, deadNumber, recoverNumber));
     }
 
@@ -180,6 +259,24 @@ public class Area : MonoBehaviour
         }
     }
 
+    public void PrintStateOfDots()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            writer.Write(infectionDeathRate.ToString(nfi) + "," + infectionRate.ToString(nfi) + "," + reInfectionRate.ToString(nfi) + "," + recoveryRate.ToString(nfi) + "," + symptomsRate.ToString(nfi));
+            for (int j = 0; j < 200; j++)
+            {
+                writer.Write("," + dotsStateEveryYear[i][j].GetxPos().ToString(nfi) + "," + dotsStateEveryYear[i][j].GetyPos().ToString(nfi) + "," + dotsStateEveryYear[i][j].GetzRot().ToString(nfi) + ","  + dotsStateEveryYear[i][j].GetNotInfected() + "," + dotsStateEveryYear[i][j].GetInfected() + "," + dotsStateEveryYear[i][j].GetRecovered() + "," + dotsStateEveryYear[i][j].GetDead());
+            }
+            for (int j = 0; j < 200; j++)
+            {
+                writer.Write("," + dotsStateEveryYear[i+1][j].GetxPos().ToString(nfi) + "," + dotsStateEveryYear[i+1][j].GetyPos().ToString(nfi) + "," + dotsStateEveryYear[i+1][j].GetzRot().ToString(nfi) + "," + dotsStateEveryYear[i + 1][j].GetNotInfected() + "," + dotsStateEveryYear[i + 1][j].GetInfected() + "," + dotsStateEveryYear[i + 1][j].GetRecovered() + "," + dotsStateEveryYear[i + 1][j].GetDead());
+            }
+            writer.WriteLine();
+            writer.Flush();
+        }
+    }
+
     void OnApplicationQuit()
     {
         writer.Close();
@@ -187,24 +284,24 @@ public class Area : MonoBehaviour
 
     public void NewSimulation()
     {
-        infectionDeathRate += 0.13f;
-        if (infectionDeathRate > 0.71f)
+        infectionDeathRate += 0.2f;
+        if (infectionDeathRate > 0.70f)
         {
-            infectionDeathRate = 0f;
-            infectionRate += 0.13f;
-            if (infectionRate > 0.71f)
+            infectionDeathRate = 0.05f;
+            infectionRate += 0.2f;
+            if (infectionRate > 0.70f)
             {
-                infectionRate = 0f;
-                reInfectionRate += 0.13f;
-                if (reInfectionRate > 0.71f)
+                infectionRate = 0.05f;
+                reInfectionRate += 0.2f;
+                if (reInfectionRate > 0.70f)
                 {
-                    reInfectionRate = 0f;
-                    recoveryRate += 0.13f;
-                    if (recoveryRate > 0.71f)
+                    reInfectionRate = 0.05f;
+                    recoveryRate += 0.2f;
+                    if (recoveryRate > 0.70f)
                     {
-                        recoveryRate = 0f;
-                        symptomsRate += 0.13f;
-                        if (symptomsRate > 0.71f)
+                        recoveryRate = 0.05f;
+                        symptomsRate += 0.2f;
+                        if (symptomsRate > 0.70f)
                         {
                             Debug.Log("Koniec");
                             Application.Quit();
@@ -223,6 +320,7 @@ public class Area : MonoBehaviour
             Destroy(dots[i]);
         }
         stateEveryYear = new List<WorldState>();
+        dotsStateEveryYear = new List<DotState[]>();
 
         transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
 
