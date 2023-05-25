@@ -133,7 +133,6 @@ public class Area : MonoBehaviour
         //writer.WriteLine("InfDeadRate,InfRate,ReInfRate,RecovRate,SympRate,Dead,Infected,Notinfecte,Recovered");
 
 
-        Random.InitState((int)DateTime.Now.Ticks);
         Initialize();
     }
     void FixedUpdate()
@@ -146,8 +145,8 @@ public class Area : MonoBehaviour
             CountDifferentDots();
             if (currentYear == 10)
             {
-                //PrintStateArray();
-                PrintStateOfDots();
+                PrintStateArray();
+                //PrintStateOfDots();
                 NewSimulation();
             }
 
@@ -224,29 +223,29 @@ public class Area : MonoBehaviour
             else if (dot.tag == "Recovered") { recoverNumber++; }
         }
 
-        DotState[] dotsArray = new DotState[200];
+        //DotState[] dotsArray = new DotState[200];
 
-        for (int i = 0; i < 200; i++)
-        {
-            short notinf = 0;
-            if (dots[i].tag == "Uninfected")
-                notinf = 1;
+        //for (int i = 0; i < 200; i++)
+        //{
+        //    short notinf = 0;
+        //    if (dots[i].tag == "Uninfected")
+        //        notinf = 1;
 
-            short inf = 0;
-            if (dots[i].tag == "Infected" || dots[i].tag == "SInfected")
-                inf = 1;
+        //    short inf = 0;
+        //    if (dots[i].tag == "Infected" || dots[i].tag == "SInfected")
+        //        inf = 1;
 
-            short rec = 0;
-            if (dots[i].tag == "Recovered")
-                rec = 1;
+        //    short rec = 0;
+        //    if (dots[i].tag == "Recovered")
+        //        rec = 1;
 
-            short dead = 0;
-            if (dots[i].tag == "Dead")
-                dead = 1;
+        //    short dead = 0;
+        //    if (dots[i].tag == "Dead")
+        //        dead = 1;
 
-            dotsArray[i] = new DotState(dots[i].transform.position.x, dots[i].transform.position.y, dots[i].transform.rotation.z, notinf, inf, rec, dead);
-        }
-        dotsStateEveryYear.Add(dotsArray);
+        //    dotsArray[i] = new DotState(dots[i].transform.position.x, dots[i].transform.position.y, dots[i].transform.rotation.z, notinf, inf, rec, dead);
+        //}
+        //dotsStateEveryYear.Add(dotsArray);
         stateEveryYear.Add(new WorldState(notinfNumber, infNumber, deadNumber, recoverNumber));
     }
 
@@ -315,12 +314,14 @@ public class Area : MonoBehaviour
 
     public void Initialize()
     {
+        Random.InitState(5);
+
         for (int i = 0; i < numberOfDots; i++)
         {
             Destroy(dots[i]);
         }
         stateEveryYear = new List<WorldState>();
-        dotsStateEveryYear = new List<DotState[]>();
+        //dotsStateEveryYear = new List<DotState[]>();
 
         transform.localScale = new Vector3(areaHeight, areaWidth, 1f);
 
