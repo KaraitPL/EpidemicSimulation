@@ -1,4 +1,4 @@
-# Symulacja Epidemi
+# Symulacja Epidemii
 
 Witaj! Poniżej znajdziesz link do dokumentacji:
 
