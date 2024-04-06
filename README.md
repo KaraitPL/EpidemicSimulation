@@ -2,6 +2,6 @@
 
 Witaj! Poniżej znajdziesz link do dokumentacji:
 
-[Dokumentacja](SprawozdanieFinal (1).docx)
+[Dokumentacja](SprawozdanieFinal(1).docx)
 
 
